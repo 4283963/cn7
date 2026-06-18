@@ -23,6 +23,7 @@ public class MainController {
     @FXML private TextField searchField;
     @FXML private TextField titleField;
     @FXML private ComboBox<String> nodeTypeCombo;
+    @FXML private ComboBox<StoryNode> parentNodeCombo;
     @FXML private Label idLabel;
     @FXML private TextArea contentArea;
     @FXML private ListView<Condition> conditionsList;
@@ -119,6 +120,7 @@ public class MainController {
         conditionsList.setItems(conditions);
 
         updateTargetNodeCombo();
+        updateParentNodeCombo();
 
         addChildBtn.setDisable(false);
         deleteBtn.setDisable(false);
@@ -204,6 +206,55 @@ public class MainController {
         });
     }
 
+    private void updateParentNodeCombo() {
+        ObservableList<StoryNode> items = FXCollections.observableArrayList();
+        items.add(null);
+        if (currentNode != null) {
+            Set<Integer> excludedIds = new HashSet<>();
+            collectAllChildIds(currentNode, excludedIds);
+            excludedIds.add(currentNode.getId());
+
+            List<StoryNode> validParents = allNodesMap.values().stream()
+                    .filter(n -> !excludedIds.contains(n.getId()))
+                    .sorted(Comparator.comparing(StoryNode::getTitle))
+                    .collect(Collectors.toList());
+            items.addAll(validParents);
+        } else {
+            items.addAll(allNodesMap.values().stream()
+                    .sorted(Comparator.comparing(StoryNode::getTitle))
+                    .collect(Collectors.toList()));
+        }
+        parentNodeCombo.setItems(items);
+        parentNodeCombo.setButtonCell(new ListCell<StoryNode>() {
+            @Override
+            protected void updateItem(StoryNode item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "无（根节点）" : item.getTitle());
+            }
+        });
+        parentNodeCombo.setCellFactory(param -> new ListCell<StoryNode>() {
+            @Override
+            protected void updateItem(StoryNode item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "无（根节点）" : item.getTitle());
+            }
+        });
+
+        if (currentNode != null && currentNode.getParentId() != null) {
+            parentNodeCombo.setValue(allNodesMap.get(currentNode.getParentId()));
+        } else {
+            parentNodeCombo.setValue(null);
+        }
+    }
+
+    private void collectAllChildIds(StoryNode node, Set<Integer> ids) {
+        if (node == null || node.getChildren() == null) return;
+        for (StoryNode child : node.getChildren()) {
+            ids.add(child.getId());
+            collectAllChildIds(child, ids);
+        }
+    }
+
     @FXML
     public void refreshTree() {
         try {
@@ -213,8 +264,8 @@ public class MainController {
             rootItem.getChildren().clear();
             buildTreeItems(fullTreeCache, rootItem);
 
-            clearDetailPanel();
             updateTargetNodeCombo();
+            updateParentNodeCombo();
             setStatus("已刷新剧情树，共 " + allNodesMap.size() + " 个节点");
         } catch (SQLException e) {
             showError("刷新失败", e.getMessage());
@@ -307,6 +358,13 @@ public class MainController {
         currentNode.setNodeType(nodeTypeCombo.getValue());
         currentNode.setContent(contentArea.getText());
 
+        StoryNode selectedParent = parentNodeCombo.getValue();
+        Integer newParentId = selectedParent != null ? selectedParent.getId() : null;
+        boolean parentChanged = (currentNode.getParentId() == null && newParentId != null)
+                || (currentNode.getParentId() != null && !currentNode.getParentId().equals(newParentId))
+                || (currentNode.getParentId() != null && newParentId != null && !currentNode.getParentId().equals(newParentId));
+        currentNode.setParentId(newParentId);
+
         if (currentNode.getTitle().isEmpty()) {
             showError("保存失败", "节点标题不能为空");
             return;
@@ -316,7 +374,11 @@ public class MainController {
             nodeService.saveNode(currentNode);
             refreshTree();
             selectNodeById(currentNode.getId());
-            setStatus("已保存节点: " + currentNode.getTitle());
+            if (parentChanged) {
+                setStatus("已保存节点并更新父节点: " + currentNode.getTitle());
+            } else {
+                setStatus("已保存节点: " + currentNode.getTitle());
+            }
         } catch (SQLException e) {
             showError("保存失败", e.getMessage());
             e.printStackTrace();
@@ -378,7 +440,18 @@ public class MainController {
 
         try {
             nodeService.saveCondition(currentCondition);
-            conditionsList.refresh();
+            int savedNodeId = currentNode.getId();
+            int savedConditionId = currentCondition.getId();
+            refreshTree();
+            selectNodeById(savedNodeId);
+            if (currentNode != null) {
+                for (Condition c : currentNode.getConditions()) {
+                    if (c.getId() == savedConditionId) {
+                        conditionsList.getSelectionModel().select(c);
+                        break;
+                    }
+                }
+            }
             setStatus("已保存条件");
         } catch (SQLException e) {
             showError("保存失败", e.getMessage());

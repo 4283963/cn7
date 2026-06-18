@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -58,8 +58,11 @@
                             </items>
                         </ComboBox>
 
-                        <Label text="节点ID:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                        <Label fx:id="idLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="父节点:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <ComboBox fx:id="parentNodeCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="节点ID:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <Label fx:id="idLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                     </GridPane>
 
                     <Label text="剧情内容:" styleClass="subsection-title" />
