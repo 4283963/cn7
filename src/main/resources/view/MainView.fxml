@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.textadventure.editor.ui.MainController"
+            prefHeight="800.0" prefWidth="1200.0">
+
+    <top>
+        <ToolBar prefHeight="40.0">
+            <Button text="新建根节点" onAction="#createRootNode" />
+            <Button text="添加子节点" onAction="#addChildNode" fx:id="addChildBtn" disable="true" />
+            <Button text="删除节点" onAction="#deleteNode" fx:id="deleteBtn" disable="true" />
+            <Separator orientation="VERTICAL" />
+            <Button text="刷新" onAction="#refreshTree" />
+            <Button text="保存当前节点" onAction="#saveCurrentNode" fx:id="saveBtn" disable="true" />
+            <Separator orientation="VERTICAL" />
+            <Button text="导入示例数据" onAction="#importSampleData" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Label fx:id="statusLabel" text="就绪" styleClass="status-label" />
+        </ToolBar>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.3">
+            <items>
+                <VBox spacing="5" styleClass="left-panel">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10" />
+                    </padding>
+                    <Label text="剧情节点树" styleClass="section-title" />
+                    <TextField fx:id="searchField" promptText="搜索节点..." onKeyReleased="#onSearch" />
+                    <TreeView fx:id="storyTree" VBox.vgrow="ALWAYS" styleClass="story-tree" />
+                </VBox>
+
+                <VBox spacing="10" styleClass="right-panel" fx:id="detailPanel">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10" />
+                    </padding>
+
+                    <Label text="节点详情" styleClass="section-title" />
+
+                    <GridPane hgap="10" vgap="10">
+                        <Label text="节点标题:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="titleField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label text="节点类型:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="nodeTypeCombo" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <items>
+                                <String fx:value="normal" />
+                                <String fx:value="branch" />
+                                <String fx:value="ending" />
+                                <String fx:value="start" />
+                            </items>
+                        </ComboBox>
+
+                        <Label text="节点ID:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <Label fx:id="idLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    </GridPane>
+
+                    <Label text="剧情内容:" styleClass="subsection-title" />
+                    <TextArea fx:id="contentArea" VBox.vgrow="ALWAYS" wrapText="true" />
+
+                    <Label text="前置条件:" styleClass="subsection-title" />
+                    <VBox spacing="5" styleClass="conditions-panel">
+                        <HBox spacing="5">
+                            <Button text="添加条件" onAction="#addCondition" fx:id="addConditionBtn" disable="true" />
+                            <Button text="删除选中条件" onAction="#deleteCondition" fx:id="deleteConditionBtn" disable="true" />
+                        </HBox>
+                        <ListView fx:id="conditionsList" VBox.vgrow="ALWAYS" />
+                    </VBox>
+
+                    <TitledPane text="条件详情编辑" collapsible="true">
+                        <content>
+                            <GridPane hgap="10" vgap="10" padding="$insets">
+                                <Label text="条件类型:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                <ComboBox fx:id="conditionTypeCombo" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <items>
+                                        <String fx:value="prerequisite" />
+                                        <String fx:value="variable" />
+                                        <String fx:value="flag" />
+                                    </items>
+                                </ComboBox>
+
+                                <Label text="描述:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                <TextField fx:id="conditionDescField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                <Label text="前置节点:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                <ComboBox fx:id="targetNodeCombo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <Label text="变量名:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                <TextField fx:id="conditionKeyField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                <Label text="运算符:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                <ComboBox fx:id="operatorCombo" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                    <items>
+                                        <String fx:value="equals" />
+                                        <String fx:value="not_equals" />
+                                        <String fx:value="greater_than" />
+                                        <String fx:value="less_than" />
+                                        <String fx:value="greater_or_equal" />
+                                        <String fx:value="less_or_equal" />
+                                        <String fx:value="contains" />
+                                    </items>
+                                </ComboBox>
+
+                                <Label text="值:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                <TextField fx:id="conditionValueField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                                <Button text="保存条件" onAction="#saveCondition" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2" />
+                            </GridPane>
+                        </content>
+                    </TitledPane>
+                </VBox>
+            </items>
+        </SplitPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,129 @@
+.root {
+    -fx-font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 10px 0;
+}
+
+.subsection-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+    -fx-padding: 5px 0 5px 0;
+}
+
+.left-panel {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 0 1px 0 0;
+}
+
+.right-panel {
+    -fx-background-color: #ffffff;
+}
+
+.status-label {
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 12px;
+}
+
+.story-tree {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 4px;
+}
+
+.tree-cell {
+    -fx-padding: 8px 10px;
+}
+
+.tree-cell:selected {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+}
+
+.tree-cell.ending {
+    -fx-text-fill: #e74c3c;
+}
+
+.tree-cell.ending:selected {
+    -fx-text-fill: white;
+}
+
+.tree-cell.branch {
+    -fx-text-fill: #f39c12;
+}
+
+.tree-cell.branch:selected {
+    -fx-text-fill: white;
+}
+
+.tree-cell.start {
+    -fx-text-fill: #27ae60;
+    -fx-font-weight: bold;
+}
+
+.tree-cell.start:selected {
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.button:hover {
+    -fx-background-color: #0056b3;
+}
+
+.button:disabled {
+    -fx-background-color: #6c757d;
+    -fx-opacity: 0.65;
+}
+
+.text-field, .text-area, .combo-box, .list-view {
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.text-area {
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-font-size: 13px;
+    -fx-line-height: 1.6;
+}
+
+.conditions-panel {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 10px;
+    -fx-border-radius: 4px;
+    -fx-border-color: #e9ecef;
+}
+
+.titled-pane {
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.titled-pane > .title {
+    -fx-background-color: #e9ecef;
+    -fx-padding: 10px;
+    -fx-font-weight: bold;
+}
+
+.tool-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 0 0 1px 0;
+    -fx-spacing: 5px;
+    -fx-padding: 5px 10px;
+}
