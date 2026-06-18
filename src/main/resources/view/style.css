@@ -127,3 +127,46 @@
     -fx-spacing: 5px;
     -fx-padding: 5px 10px;
 }
+
+.bottom-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.detect-btn {
+    -fx-background-color: #9b59b6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.detect-btn:hover {
+    -fx-background-color: #8e44ad;
+}
+
+.analysis-result {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.analysis-result.success {
+    -fx-text-fill: #27ae60;
+}
+
+.analysis-result.warning {
+    -fx-text-fill: #e74c3c;
+}
+
+.tree-cell.dead-end {
+    -fx-text-fill: #9b59b6;
+    -fx-font-weight: bold;
+    -fx-background-color: #f3e5f5;
+}
+
+.tree-cell.dead-end:selected {
+    -fx-background-color: #9b59b6;
+    -fx-text-fill: white;
+}

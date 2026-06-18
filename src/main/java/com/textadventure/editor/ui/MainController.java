@@ -2,6 +2,7 @@ package com.textadventure.editor.ui;
 
 import com.textadventure.editor.model.Condition;
 import com.textadventure.editor.model.StoryNode;
+import com.textadventure.editor.service.StoryAnalyzer;
 import com.textadventure.editor.service.StoryNodeService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -40,8 +41,12 @@ public class MainController {
     @FXML private Button deleteConditionBtn;
     @FXML private Label statusLabel;
     @FXML private VBox detailPanel;
+    @FXML private Label analysisResultLabel;
+    @FXML private Button clearHighlightBtn;
 
     private StoryNodeService nodeService;
+    private StoryAnalyzer storyAnalyzer;
+    private StoryAnalyzer.AnalysisResult currentAnalysisResult;
     private Stage primaryStage;
     private StoryNode currentNode;
     private Condition currentCondition;
@@ -53,6 +58,7 @@ public class MainController {
     @FXML
     public void initialize() {
         nodeService = new StoryNodeService();
+        storyAnalyzer = new StoryAnalyzer();
         allNodesMap = new HashMap<>();
         rootItem = new TreeItem<>();
         rootItem.setValue(new StoryNode());
@@ -91,12 +97,20 @@ public class MainController {
                         super.updateItem(item, empty);
                         if (empty || item == null) {
                             setText(null);
-                            getStyleClass().removeAll("start", "branch", "ending", "normal");
+                            getStyleClass().removeAll("start", "branch", "ending", "normal", "dead-end");
                         } else {
                             setText(item.toString());
-                            getStyleClass().removeAll("start", "branch", "ending", "normal");
-                            if (item.getNodeType() != null) {
-                                getStyleClass().add(item.getNodeType());
+                            getStyleClass().removeAll("start", "branch", "ending", "normal", "dead-end");
+
+                            if (currentAnalysisResult != null && currentAnalysisResult.isDeadEnd(item.getId())) {
+                                getStyleClass().add("dead-end");
+                                String reason = currentAnalysisResult.getReason(item.getId());
+                                setTooltip(new Tooltip("死路节点：" + reason));
+                            } else {
+                                if (item.getNodeType() != null) {
+                                    getStyleClass().add(item.getNodeType());
+                                }
+                                setTooltip(null);
                             }
                         }
                     }
@@ -653,5 +667,73 @@ public class MainController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @FXML
+    public void detectDeadEnds() {
+        if (allNodesMap == null || allNodesMap.isEmpty()) {
+            showError("无法检测", "当前没有剧情节点，请先创建或导入剧情数据");
+            return;
+        }
+
+        setStatus("正在检测死路节点...");
+
+        new Thread(() -> {
+            try {
+                currentAnalysisResult = storyAnalyzer.analyze(fullTreeCache, allNodesMap);
+
+                Platform.runLater(() -> {
+                    storyTree.refresh();
+
+                    int deadEndCount = currentAnalysisResult.getDeadEndCount();
+                    if (deadEndCount > 0) {
+                        analysisResultLabel.setText("⚠ 检测到 " + deadEndCount + " 个死路节点（已高亮显示为紫色）");
+                        analysisResultLabel.getStyleClass().removeAll("success");
+                        analysisResultLabel.getStyleClass().add("warning");
+
+                        List<String> deadEndNames = new ArrayList<>();
+                        for (Integer nodeId : currentAnalysisResult.getDeadEndNodeIds()) {
+                            StoryNode node = allNodesMap.get(nodeId);
+                            if (node != null) {
+                                deadEndNames.add(node.getTitle());
+                            }
+                        }
+
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("死路节点检测结果");
+                        alert.setHeaderText("检测到 " + deadEndCount + " 个死路节点");
+                        alert.setContentText("以下节点由于前置条件矛盾或其他原因，玩家无论如何都无法到达：\n\n• "
+                                + String.join("\n• ", deadEndNames)
+                                + "\n\n请将鼠标悬停在紫色节点上查看具体原因。");
+                        alert.showAndWait();
+
+                        clearHighlightBtn.setDisable(false);
+                    } else {
+                        analysisResultLabel.setText("✓ 恭喜！所有节点均可达，没有检测到死路节点");
+                        analysisResultLabel.getStyleClass().removeAll("warning");
+                        analysisResultLabel.getStyleClass().add("success");
+                        clearHighlightBtn.setDisable(true);
+                    }
+
+                    setStatus("死路节点检测完成");
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    showError("检测失败", e.getMessage());
+                    setStatus("检测失败");
+                });
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    @FXML
+    public void clearDeadEndHighlight() {
+        currentAnalysisResult = null;
+        storyTree.refresh();
+        analysisResultLabel.setText("");
+        analysisResultLabel.getStyleClass().removeAll("success", "warning");
+        clearHighlightBtn.setDisable(true);
+        setStatus("已清除死路节点高亮");
     }
 }

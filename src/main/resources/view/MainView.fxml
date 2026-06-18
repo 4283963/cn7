@@ -3,6 +3,7 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
@@ -122,4 +123,21 @@
             </items>
         </SplitPane>
     </center>
+
+    <bottom>
+        <BorderPane styleClass="bottom-bar">
+            <padding>
+                <Insets top="8" right="10" bottom="8" left="10" />
+            </padding>
+            <left>
+                <Label fx:id="analysisResultLabel" text="" styleClass="analysis-result" />
+            </left>
+            <right>
+                <HBox spacing="10">
+                    <Button text="清除高亮" onAction="#clearDeadEndHighlight" fx:id="clearHighlightBtn" disable="true" />
+                    <Button text="🔍 检测死路节点" onAction="#detectDeadEnds" styleClass="detect-btn" />
+                </HBox>
+            </right>
+        </BorderPane>
+    </bottom>
 </BorderPane>
